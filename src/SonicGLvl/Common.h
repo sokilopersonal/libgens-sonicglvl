@@ -17,6 +17,8 @@
 //    Read AUTHORS.txt, LICENSE.txt and COPYRIGHT.txt for more details.
 //=========================================================================
 
+#pragma once
+
 #include "DynamicLines.h"
 #include "Resource.h"
 #include "Model.h"

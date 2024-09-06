@@ -16,9 +16,9 @@
 //
 //    Read AUTHORS.txt, LICENSE.txt and COPYRIGHT.txt for more details.
 //=========================================================================
-
 #include "Common.h"
 #include "EditorViewport.h"
+#include "Event.h"
 
 #ifndef EDITOR_AXIS_H_INCLUDED
 #define EDITOR_AXIS_H_INCLUDED
@@ -77,6 +77,8 @@ class EditorAxis {
 		Ogre::Vector3 translate;
 		Ogre::Quaternion rotate;
 
+		EditorViewport *viewport;
+
 		bool mode;
 		bool holding;
 		bool visible;
@@ -89,6 +91,7 @@ class EditorAxis {
 	public:
 		EditorAxis(Ogre::SceneManager *scene_manager);
 		void update(EditorViewport *viewport);
+		void updatePosition(Ogre::Camera* camera);
 		bool mouseMoved(EditorViewport *viewport, const OIS::MouseEvent &arg);
 		bool mousePressed(EditorViewport *viewport, const OIS::MouseEvent &arg, OIS::MouseButtonID id);
 		bool mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID id);
@@ -119,6 +122,10 @@ class EditorAxis {
 		void setRotationAndTranslate(Ogre::Quaternion v) {
 			rotate = v * rotation.Inverse();
 			rotation = v;
+		}
+
+		void setViewport(EditorViewport *v) {
+			viewport = v;
 		}
 
 		Ogre::Vector3 getPosition() {

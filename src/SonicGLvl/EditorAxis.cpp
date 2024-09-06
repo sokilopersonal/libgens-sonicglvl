@@ -96,15 +96,20 @@ void EditorAxis::update(EditorViewport *viewport) {
 		return;
 	}
 
+	updatePosition(camera);
+}
+
+void EditorAxis::updatePosition(Ogre::Camera* camera)
+{
 	scene_node_position->setPosition(position);
 	scene_node_position->setOrientation(rotation);
 
 	scene_node_rotation->setPosition(position);
 	scene_node_rotation->setOrientation(rotation);
 
-	float distance=camera->getPosition().distance(position);
-	scene_node_position->setScale(Ogre::Vector3(distance*EDITOR_AXIS_POSITION_SCALE_MULTIPLIER));
-	scene_node_rotation->setScale(Ogre::Vector3(distance*EDITOR_AXIS_ROTATION_SCALE_MULTIPLIER));
+	float distance = camera->getPosition().distance(position);
+	scene_node_position->setScale(Ogre::Vector3(distance * EDITOR_AXIS_POSITION_SCALE_MULTIPLIER));
+	scene_node_rotation->setScale(Ogre::Vector3(distance * EDITOR_AXIS_ROTATION_SCALE_MULTIPLIER));
 
 	scene_node_position->setVisible(visible && !mode);
 	scene_node_rotation->setVisible(visible && mode);
@@ -226,7 +231,6 @@ Ogre::Radian EditorAxis::raycastAngleToAxis(EditorViewport *viewport, float rayc
 
 	return Ogre::Radian(0);
 }
-
 
 bool EditorAxis::mouseMoved(EditorViewport *viewport, const OIS::MouseEvent &arg) {
 	if (!holding) {

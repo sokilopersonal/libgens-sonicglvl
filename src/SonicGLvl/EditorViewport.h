@@ -18,6 +18,7 @@
 //=========================================================================
 
 #include "Common.h"
+#include "Event.h"
 
 #ifndef EDITOR_VIEWPORT_H_INCLUDED
 #define EDITOR_VIEWPORT_H_INCLUDED
@@ -67,7 +68,6 @@ class EditorViewport {
 
 		void setRotationMultiplier(float v) {
 			rotation_multiplier = v;
-
 		}
 		void setZoomingMultiplier(float v) {
 			zooming_multiplier = v;

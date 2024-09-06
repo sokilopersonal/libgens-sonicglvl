@@ -192,7 +192,7 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 }
 
 void TrajectoryNode::getTrajectoryTrickJumper(EditorNode* node, bool second) {
-	ObjectNode* object_node = editor_application->getObjectNodeFromEditorNode(node);
+	/*ObjectNode* object_node = editor_application->getObjectNodeFromEditorNode(node);
 	LibGens::Object* object = object_node->getObject();
 
 	std::string speed_key = second ? "SecondSpeed" : "FirstSpeed";
@@ -226,7 +226,60 @@ void TrajectoryNode::getTrajectoryTrickJumper(EditorNode* node, bool second) {
 
 	if (m_total_time >= m_max_time) {
 		resetTime();
-	}
+	}*/
+
+	ObjectNode* object_node = editor_application->getObjectNodeFromEditorNode(node);
+	LibGens::Object* object = object_node->getObject();
+	std::string object_name = object->getName();
+
+	LibGens::ObjectElementFloat* speed_property;
+	LibGens::ObjectElementFloat* angle_property;
+	LibGens::ObjectElementFloat* size_property;
+	int angle_type;
+	int size_type;
+	float angle;
+
+	std::string speed_variable = second ? "SecondSpeed" : "FirstSpeed";
+	std::string angle_variable = second ? "SecondPitch" : "FirstPitch";
+	speed_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement(speed_variable));
+	angle_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement(angle_variable));
+
+	float impulse = speed_property->value;
+	angle = angle_property->value;
+
+	Ogre::Vector3 direction(0, 0, 1);
+	Ogre::Quaternion obj_rotation = node->getRotation();
+	Ogre::Radian y_rad, p_rad, r_rad;
+	Ogre::Matrix3 rot_matrix;
+	obj_rotation.ToRotationMatrix(rot_matrix);
+	rot_matrix.ToEulerAnglesYXZ(y_rad, p_rad, r_rad);
+
+	Ogre::Real yaw_rad = y_rad.valueRadians();
+	Ogre::Real pitch_rad = p_rad.valueRadians();
+	Ogre::Real roll_rad = r_rad.valueRadians();
+	pitch_rad += (angle * LIBGENS_MATH_PI) / 180;
+
+	rot_matrix.FromEulerAnglesYXZ(Ogre::Radian(yaw_rad), Ogre::Radian(pitch_rad), Ogre::Radian(roll_rad));
+	obj_rotation.FromRotationMatrix(rot_matrix);
+
+	direction = obj_rotation * direction;
+	direction *= -1;
+
+	if (m_total_time >= m_max_time)
+		resetTime();
+
+	act_gravity = true;
+	float gravity = LIBGENS_MATH_GRAVITY;
+	float delta_y = (impulse * m_total_time * direction.y) + (0.5 * -gravity * (m_total_time * m_total_time));
+
+	float new_pos_x = (impulse * m_total_time) * direction.x;
+	float new_pos_y = delta_y + 1.0f;
+	float new_pos_z = (impulse * m_total_time) * direction.z;
+
+	Ogre::Vector3 new_position = node->getPosition();
+	Ogre::Vector3 position_add(new_pos_x, new_pos_y, new_pos_z);
+	new_position += position_add;
+	setPosition(new_position);
 }
 
 void TrajectoryNode::getTrajectoryDashRing(EditorNode* node)

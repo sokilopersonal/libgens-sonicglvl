@@ -51,7 +51,7 @@ EditorViewport::EditorViewport(Ogre::SceneManager *scene_manager, Ogre::SceneMan
 
 	bg_color = Ogre::ColourValue(0.4, 0.4, 0.4);
 
-    Ogre::Radian fov = Ogre::Radian(Ogre::Degree(70.0f));
+    Ogre::Radian fov = Ogre::Radian(Ogre::Degree(75.0f));
 	camera = scene_manager->createCamera(camera_name);
     camera->setPosition(Ogre::Vector3(0,1,0));
     camera->lookAt(Ogre::Vector3(10,1,0));
@@ -78,13 +78,11 @@ EditorViewport::EditorViewport(Ogre::SceneManager *scene_manager, Ogre::SceneMan
 	viewport_overlay->setClearEveryFrame(true, Ogre::FBT_DEPTH);
 	viewport_overlay->setSkiesEnabled(false);
 
-
 	ray_scene_query          =  scene_manager->createRayQuery(Ogre::Ray());
 	ray_scene_query_overlay  =  axis_scene_manager->createRayQuery(Ogre::Ray());
 
 	current_entity = NULL;
 }
-
 
 void EditorViewport::resize(float left, float top, float width, float height) {
 	viewport->setDimensions(left, top, width, height);
@@ -93,8 +91,6 @@ void EditorViewport::resize(float left, float top, float width, float height) {
 	viewport_overlay->setDimensions(left, top, width, height);
 	camera_overlay->setAspectRatio(Ogre::Real(viewport_overlay->getActualWidth()) / Ogre::Real(viewport_overlay->getActualHeight()));
 }
-
-
 
 bool EditorViewport::keyPressed(const OIS::KeyEvent& arg) {
     switch (arg.key) {
@@ -377,14 +373,20 @@ bool EditorViewport::mouseMoved(const OIS::MouseEvent& arg) {
         camera_overlay->moveRelative(Ogre::Vector3(-mouse_movement_x * panning_multiplier, mouse_movement_y * panning_multiplier, 0));
     }
 
-    if (arg.state.Z.rel != 0 && !rotating) {
+    if (arg.state.Z.rel != 0 && !rotating && isMouseInLocalScreen(arg)) {
         float zoom_amount = arg.state.Z.rel * zooming_multiplier * 0.45f;
-        camera->move(camera->getDirection() * zoom_amount * global_multiplier * 0.2f);
-        camera_overlay->move(camera->getDirection() * zoom_amount * global_multiplier * 0.1f);
+
+        //focusOnPoint(camera->getRealPosition() + camera->getRealDirection() * (arg.state.Z.rel > 0 ? 1.0f : -1.0f), -zooming_multiplier, camera->getRealDirection());
+
+        /*camera->setPosition(camera->getRealDirection() * zoom_amount * global_multiplier * 0.2f);
+        camera_overlay->setPosition(camera_overlay->getRealDirection() * zoom_amount * global_multiplier * 0.2f);*/
+
+        camera->move(camera->getRealDirection() * zoom_amount * global_multiplier * 0.35f);
+        camera_overlay->move(camera_overlay->getRealDirection() * zoom_amount * global_multiplier * 0.35f);
     }
     else if (arg.state.Z.rel != 0 && rotating) {
-        global_multiplier += arg.state.Z.rel * 0.0015f;
-		global_multiplier = Ogre::Math::Clamp(global_multiplier, 0.2f, 5.0f);
+        global_multiplier += arg.state.Z.rel * 0.0021f;
+		global_multiplier = Ogre::Math::Clamp(global_multiplier, 0.2f, 20.0f);
 	}
 
     float mouse_x = arg.state.X.abs / float(arg.state.width);

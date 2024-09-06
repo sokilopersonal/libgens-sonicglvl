@@ -608,26 +608,7 @@ void EditorApplication::createScene(void) {
 	color_listener = new ColorListener(scene_manager);
 	depth_listener = new DepthListener(scene_manager);
 
-	/*
-	Ogre::TexturePtr rtt_texture = Ogre::TextureManager::getSingleton().createManual("ColorTex", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, Ogre::TEX_TYPE_2D, window->getWidth()/2.0, window->getHeight()/2.0, 0, Ogre::PF_R8G8B8, Ogre::TU_RENDERTARGET);
-	color_texture = rtt_texture->getBuffer()->getRenderTarget();
-	color_texture->addViewport(viewport->getCamera());
-	color_texture->getViewport(0)->setClearEveryFrame(true);
-	color_texture->getViewport(0)->setBackgroundColour(Ogre::ColourValue::Black);
-	color_texture->getViewport(0)->setOverlaysEnabled(false);
-	color_texture->addListener(color_listener);
-
-	rtt_texture = Ogre::TextureManager::getSingleton().createManual("DepthTex", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, Ogre::TEX_TYPE_2D, window->getWidth()/2.0, window->getHeight()/2.0, 0, Ogre::PF_FLOAT32_R, Ogre::TU_RENDERTARGET);
-	depth_texture = rtt_texture->getBuffer()->getRenderTarget();
-	Ogre::Viewport *depthViewport=depth_texture->addViewport(viewport->getCamera());
-	depth_texture->getViewport(0)->setClearEveryFrame(true);
-	depth_texture->getViewport(0)->setBackgroundColour(Ogre::ColourValue::White);
-	depth_texture->getViewport(0)->setOverlaysEnabled(false);
-	depth_texture->addListener(depth_listener);
-	*/
-
 	global_illumination_listener = new GlobalIlluminationListener();
-	//global_illumination_listener->setPassToIgnore(depth_listener->getDepthPass());
 	scene_manager->addRenderObjectListener(global_illumination_listener); 
 
 	current_node = NULL;
@@ -811,9 +792,11 @@ bool EditorApplication::keyPressed(const OIS::KeyEvent &arg) {
 
 		if (!mouse->getMouseState().buttonDown(OIS::MB_Right)) {
 
-			if (arg.key == OIS::KC_F) {
-				auto* selectedNode = getSelectedNodes().front();
-				viewport->focusOnPoint(selectedNode->getPosition(), 12.0f, viewport->getCamera()->getDirection());
+			if (arg.key == OIS::KC_F ) {
+				auto allNodes = getSelectedNodes();
+				auto* selectedNode = allNodes.front();
+
+				if (allNodes.size() <= 0) viewport->focusOnPoint(selectedNode->getPosition(), 12.0f, viewport->getCamera()->getDirection());
 			}
 
 			if (keyboard->isModifierDown(OIS::Keyboard::Ctrl)) {
